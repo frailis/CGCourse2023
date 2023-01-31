@@ -5,6 +5,8 @@
 #include "..\common\debugging.h"
  
 
+//check_gl_errors(__LINE__, __FILE__)
+
 int main(void)
 {
     GLFWwindow* window;
@@ -29,42 +31,92 @@ int main(void)
 
     printout_opengl_glsl_info();
 
-	/* create render data in RAM */
+	//--------------------------------------
+	//            MIA PARTE
+	//--------------------------------------
+
+	//creo i dati da renderizzare da buttare nella ram
+	GLuint positionAttribIndex = 0;
+	GLuint colorAttribIndex = 1;
+	float pos_colour[] = {
+		0.0, 0.0, //1st vertex
+		1.0, 0.0, 0.0, //1st vertex colour
+		0.5, 0.0, //2nd vertex
+		0.0, 1.0, 0.0, //2nd vertex colour
+		0.5, 0.5, //3rd vertex 
+		0.0, 0.0, 1.0 //3rd vertex colour
+	};
+
+	//creo il buffer per i dati da buttare in ram
+	GLuint posColourBuffer;
+	glCreateBuffers(1, &posColourBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, posColourBuffer);
+
+	//specifico che dati sto buttando nel buffer ram
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 15, pos_colour, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(positionAttribIndex);
+	glEnableVertexAttribArray(colorAttribIndex);
+
+	//specifico il formato dei dati
+
+	glVertexAttribPointer(positionAttribIndex, 2, GL_FLOAT, false, 20, 0);
+	glVertexAttribPointer(colorAttribIndex, 3, GL_FLOAT, false, 20, (GLvoid*)8);
+
+	//--------------------------------------
+	//           FINE MIA PARTE
+	//--------------------------------------
+
+	/*std::vector<float> pos_col_buf;  // programmazione a template (tipo generics)
+	for (int i = 0; i < 3; ++i) {
+		pos_col_buf.push_back(positions[2 * i]);
+		pos_col_buf.push_back(positions[2 * i + 1]);
+
+		pos_col_buf.push_back(colors[3 * i]);
+		pos_col_buf.push_back(colors[3 * i + 1]);
+		pos_col_buf.push_back(colors[3 * i + 2]);
+	}*/
+
+	// VVV  BLOCCO SOSTITUITO  VVV
+	/*
+
+	//create render data in RAM 
 	GLuint positionAttribIndex = 0;
 	float positions[] = {	0.0, 0.0,  // 1st vertex
 							0.5, 0.0,  // 2nd vertex
-							0.5, 0.5
+							0.5, 0.5   // 3rd vertex
 	};
-	/* create a buffer for the render data in video RAM */
+	//create a buffer for the render data in video RAM 
 	GLuint positionsBuffer;
 	glCreateBuffers(1, &positionsBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, positionsBuffer);
 
-	/* declare what data in RAM are filling the bufferin video RAM */
+	//declare what data in RAM are filling the bufferin video RAM 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6, positions, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(positionAttribIndex);
 
-	/* specify the data format */
+	// specify the data format 
 	glVertexAttribPointer(positionAttribIndex, 2, GL_FLOAT, false, 0, 0);
 
 	GLuint colorAttribIndex = 1;
 	float colors[] = {	1.0, 0.0, 0.0,  // 1st vertex
 						0.0, 1.0, 0.0,  // 2nd vertex
-						0.0, 0.0, 1.0
+						0.0, 0.0, 1.0   // 3rd vertex
 	};
-	/* create a buffer for the render data in video RAM */
+	//create a buffer for the render data in video RAM 
 	GLuint colorsBuffer;
 	glCreateBuffers(1, &colorsBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorsBuffer);
 
-	/* declare what data in RAM are filling the bufferin video RAM */
+	//declare what data in RAM are filling the bufferin video RAM 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 9, colors, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(colorAttribIndex);
 
-	/* specify the data format */
+	//specify the data format
 	glVertexAttribPointer(colorAttribIndex, 3, GL_FLOAT, false, 0, 0);
+	*/
+	// ^^^  BLOCCO SOSTITUITO  ^^^
 
-/*  \BEGIN IGNORATE DA QUI IN POI */
+
 	/* create a vertex shader */
 	std::string  vertex_shader_src = "#version 330\n \
         in vec2 aPosition;\
