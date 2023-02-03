@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\code_1_my_first_triangle\main.cpp">
+    <ClCompile Include="..\..\src\code_3_box2d\main.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
