@@ -38,8 +38,8 @@ int main(void)
 
     printout_opengl_glsl_info();
 
-	shader basic_shader;
-    basic_shader.create_program("shaders/basic.vert", "shaders/basic.frag");
+	shader basic_shader; //../../src/code_2_wrapping/shaders/basic.vert
+    basic_shader.create_program("../../src/code_4_my_first_car/shaders/basic.vert", "../../src/code_4_my_first_car/shaders/basic.frag");
 	basic_shader.bind("uP");
 	basic_shader.bind("uV");
 	basic_shader.bind("uT");
@@ -70,6 +70,8 @@ int main(void)
 	glm::mat4 view = glm::lookAt(glm::vec3(0, 5, 10.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 	glEnable(GL_DEPTH_TEST);
 
+	glm::mat4 transform_matrix;
+
 	/*Initialize the matrix to implement the continuos rotation aroun the y axis*/
 	glm::mat4 R = glm::mat4(1.f);
 
@@ -79,7 +81,7 @@ int main(void)
     {
 		it++;
 		/*incremente the rotation by 0.01 radians*/
-		R = glm::rotate(R, 0.01f, glm::vec3(0.f, 1.f, 0.f));
+		R = glm::rotate(R, 0.001f, glm::vec3(0.f, 1.f, 0.f));
 
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
