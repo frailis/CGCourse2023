@@ -56,6 +56,7 @@ int main(void)
 
 	/* create a  cube   centered at the origin with side 2*/
 	renderable r_cube	= shape_maker::cube(0.5,0.6,0.0);
+	renderable r_cube_window = shape_maker::cube(0, 0.6, 0.6);
 
 	/* create a  cylinder with base on the XZ plane, and height=2*/
 	renderable r_cyl	= shape_maker::cylinder(30,0.2,0.1,0.5);
@@ -70,7 +71,35 @@ int main(void)
 	glm::mat4 view = glm::lookAt(glm::vec3(0, 5, 10.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 	glEnable(GL_DEPTH_TEST);
 
-	glm::mat4 transform_matrix;
+	glm::mat4 transform_matrix_carbody(1.0f);
+	transform_matrix_carbody[2].z = 3.0;
+	transform_matrix_carbody[1].y = 0.5;
+
+	glm::mat4 transform_matrix_carbody2(1.0f);
+	transform_matrix_carbody2[2].z = 1.0;
+	transform_matrix_carbody2[1].y = 0.5;
+	transform_matrix_carbody2[3].y = 0.5;
+
+	glm::mat4 transform_window(1.0f);
+	transform_window[2].z = 0.5;
+	transform_window[1].y = 0.5;
+	transform_window[0].x = 0.8;
+	transform_window[3].x = 0;
+	transform_window[3].y = 0.4;
+	transform_window[3].z = 0.51;
+
+
+
+	//avrei potuto fare matrici parametriche e far fare i calcoli al pc ma ho poca voglia
+	glm::mat4 transform_matrix_wheel(1.0f);
+	transform_matrix_wheel[0].x = 0;
+	transform_matrix_wheel[0].y = 0.5;
+	transform_matrix_wheel[1].x = -0.2;
+	transform_matrix_wheel[1].y = 0;
+	transform_matrix_wheel[2].z = 0.5;
+	transform_matrix_wheel[3].z = 1.3;
+	transform_matrix_wheel[3].y = -0.5;
+	transform_matrix_wheel[3].x = 1.2;
 
 	/*Initialize the matrix to implement the continuos rotation aroun the y axis*/
 	glm::mat4 R = glm::mat4(1.f);
@@ -101,10 +130,43 @@ int main(void)
 		You will have to render at least once the cube and four times the cylinder.
 		Then again, you can free you immagination and make a more inventive drawing.
 		*/
+
+		transform_matrix_wheel[3].z = 1.3;
+		transform_matrix_wheel[3].x = 1.2;
+		glUniformMatrix4fv(basic_shader["uT"], 1, GL_FALSE, &transform_matrix_wheel[0][0]);
 	 	r_cyl.bind();
 	 	glDrawElements(GL_TRIANGLES,r_cyl.in, GL_UNSIGNED_INT, 0);
 
+		transform_matrix_wheel[3].z = -1.3;
+		transform_matrix_wheel[3].x = 1.2;
+		glUniformMatrix4fv(basic_shader["uT"], 1, GL_FALSE, &transform_matrix_wheel[0][0]);
+		r_cyl.bind();
+		glDrawElements(GL_TRIANGLES, r_cyl.in, GL_UNSIGNED_INT, 0);
+
+		transform_matrix_wheel[3].z = 1.3;
+		transform_matrix_wheel[3].x = -0.8;
+		glUniformMatrix4fv(basic_shader["uT"], 1, GL_FALSE, &transform_matrix_wheel[0][0]);
+		r_cyl.bind();
+		glDrawElements(GL_TRIANGLES, r_cyl.in, GL_UNSIGNED_INT, 0);
+
+		transform_matrix_wheel[3].z = -1.3;
+		transform_matrix_wheel[3].x = -0.8;
+		glUniformMatrix4fv(basic_shader["uT"], 1, GL_FALSE, &transform_matrix_wheel[0][0]);
+		r_cyl.bind();
+		glDrawElements(GL_TRIANGLES, r_cyl.in, GL_UNSIGNED_INT, 0);
+
+
+		glUniformMatrix4fv(basic_shader["uT"], 1, GL_FALSE, &transform_matrix_carbody2[0][0]);
 		r_cube.bind();
+		glDrawElements(GL_TRIANGLES, r_cube.in, GL_UNSIGNED_INT, 0);
+
+		glUniformMatrix4fv(basic_shader["uT"], 1, GL_FALSE, &transform_matrix_carbody[0][0]);
+		r_cube.bind();
+		glDrawElements(GL_TRIANGLES, r_cube.in, GL_UNSIGNED_INT, 0);
+
+
+		glUniformMatrix4fv(basic_shader["uT"], 1, GL_FALSE, &transform_window[0][0]);
+		r_cube_window.bind();
 		glDrawElements(GL_TRIANGLES, r_cube.in, GL_UNSIGNED_INT, 0);
 		/* ******************************************************/
 
