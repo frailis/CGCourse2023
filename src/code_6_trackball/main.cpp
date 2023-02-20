@@ -23,6 +23,16 @@ glm::mat4 proj;
 /* view matrix*/
 glm::mat4 view;
 
+/*rotation matrix*/
+glm::mat4 rot;
+
+/*stored point*/
+double xp0;
+double yp0;
+
+
+glm::vec3 poppy(0, 1, 0);
+
 /* a bool variable that indicates if we are currently rotating the trackball*/
 bool is_trackball_dragged;
 
@@ -30,8 +40,9 @@ bool is_trackball_dragged;
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	std::cout << xpos << " " << ypos << " " << std::endl;
-	if (!is_trackball_dragged)
+	if (!is_trackball_dragged) {
 		return;
+	}
 
 	std::cout <<"drag "<< std::endl;
 	/* here the code to create the rotation to apply before rendering the scene.
@@ -47,6 +58,49 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 	the intersection. 
 
 	*/
+
+	//camera coord 0, 6, 8.f
+
+
+	/*
+	* 
+	* TENTATIVO FALLITO
+	poppy = glm::vec3(0, 1, 0);
+
+
+	glm::vec3 ro_view(0, 0, 0);
+	glm::vec3 rd_view(xpos, ypos, 1);
+
+	glm::vec4 ro_world = view * glm::vec4(ro_view, 0);
+	glm::vec4 rd_world = view * glm::vec4(rd_view, 0);
+
+
+	glm::vec3 ro(ro_world.x, ro_world.y, ro_world.z);
+	glm::vec3 rd(rd_world.x, rd_world.y, rd_world.z);
+
+	glm::vec3 center(0, 0, 0);
+	float r = 2;
+	float c = glm::dot(ro, ro) - r*r;
+	float a = glm::dot(rd, rd);
+	float b = 2 * glm::dot(rd, (ro - center));
+	float t1 = 0;
+	float t2 = 0;
+	if (b * b >= 4 * a * c) {
+		t1 = (-b) + sqrt(b * b >= 4 * a * c) / (2 * a);
+		t2 = (-b) - sqrt(b * b >= 4 * a * c) / (2 * a);
+		
+	}
+
+	if ((glm::dot((ro + rd * t1), (ro + rd * t1)) == r * r) || (glm::dot((ro + rd * t2), (ro + rd * t2)) == r * r)) {
+		poppy = glm::vec3(1, 0, 0);
+	}
+
+	
+
+	rot = (glm::rotate(glm::mat4(1.f), (float)(xpos*0.1),  poppy));*/
+
+
+	
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -54,11 +108,12 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		/* here the button is pressed  and hence the dragging of the trackball can start*/
 		std::cout << " GLFW_MOUSE_BUTTON_LEFT PRESSED" << std::endl;
-	}
-	else 
+		is_trackball_dragged = true;
+	}else 
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
 			/* here the button is pressed  and hence the dragging of the trackball ends*/
 			std::cout << " GLFW_MOUSE_BUTTON_LEFT RELEASED" << std::endl;
+			is_trackball_dragged = false;
 	}
 }
 
@@ -79,8 +134,9 @@ int main(void)
 		return -1;
 	}
 	/* declare the callback functions on mouse events */
-	if (glfwRawMouseMotionSupported())
+	if (glfwRawMouseMotionSupported()) {
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	}
 
 	glfwSetCursorPosCallback(window, cursor_position_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
@@ -94,7 +150,7 @@ int main(void)
 
 	/* load the shaders */
 	shader basic_shader;
-	basic_shader.create_program("shaders/basic.vert", "shaders/basic.frag");
+	basic_shader.create_program("../../src/code_6_trackball/shaders/basic.vert", "../../src/code_6_trackball/shaders/basic.frag");
 	basic_shader.bind("uP");
 	basic_shader.bind("uV");
 	basic_shader.bind("uT");
@@ -119,7 +175,7 @@ int main(void)
 	check_gl_errors(__LINE__, __FILE__);
 
 	/* Transformation to setup the point of view on the scene */
-	proj = glm::frustum(-1.f, 1.f, -0.8f, 0.8f, 2.f, 100.f);
+	proj = glm::frustum(-1.f, 1.f, -0.8f, 0.8f, 2.f, 100.f); //questo mi da gli edge del view
 	view = glm::lookAt(glm::vec3(0, 6, 8.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 	glEnable(GL_DEPTH_TEST);
 
@@ -127,6 +183,8 @@ int main(void)
 
 	/* define the viewport  */
 	glViewport(0, 0, 1000, 800);
+
+	rot = glm::mat4(1.f);
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
@@ -141,10 +199,13 @@ int main(void)
 			glUniformMatrix4fv(basic_shader["uP"], 1, GL_FALSE, &proj[0][0]);
 			glUniformMatrix4fv(basic_shader["uV"], 1, GL_FALSE, &view[0][0]);
 			check_gl_errors(__LINE__, __FILE__);
-
+			
+			stack.push();
+			stack.mult(rot);
 
 			r_cube.bind();
 			stack.push();
+			
 			stack.mult(glm::scale(glm::mat4(1.f), glm::vec3(0.2, 1.0, 0.2)));
 			glUniformMatrix4fv(basic_shader["uT"], 1, GL_FALSE, &stack.m()[0][0]);
 			glUniform3f(basic_shader["uColor"], 0.0, 1.0, 0.0);
@@ -152,6 +213,7 @@ int main(void)
 			stack.pop();
 
 			stack.push();
+			//stack.mult(rot);
 			stack.mult(glm::scale(glm::mat4(1.f), glm::vec3(1, 0.2, 0.2)));
 			glUniformMatrix4fv(basic_shader["uT"], 1, GL_FALSE, &stack.m()[0][0]);
 			glUniform3f(basic_shader["uColor"], 1.0, 0.0, 0.0);
@@ -159,12 +221,14 @@ int main(void)
 			stack.pop();
 
 			stack.push();
+			//stack.mult(rot);
 			stack.mult(glm::scale(glm::mat4(1.f), glm::vec3(0.2f, 0.2f, 1.f)));
 			glUniformMatrix4fv(basic_shader["uT"], 1, GL_FALSE, &stack.m()[0][0]);
 			glUniform3f(basic_shader["uColor"], 0.0, 0.0, 1.0);
 			glDrawElements(GL_TRIANGLES, r_cube.in, GL_UNSIGNED_INT, 0);
 			stack.pop();
 			/* ******************************************************/
+			stack.pop();
 
 		glUniformMatrix4fv(basic_shader["uT"], 1, GL_FALSE, &stack.m()[0][0]);
 		glUniform3f(basic_shader["uColor"], -1.0, 0.0, 1.0);
